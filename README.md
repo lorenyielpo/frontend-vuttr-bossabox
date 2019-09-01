@@ -1,4 +1,7 @@
-# vuttr
+# Very Useful Tools To Remembers
+
+O VUTTR é uma aplicação frontend para adicionar e pesquisar ferramentadas. Para que o projeto funcione adequademente, clone o repositório em seu computador.
+
 
 ## Project setup
 ```

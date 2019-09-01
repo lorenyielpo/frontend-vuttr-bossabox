@@ -1,74 +1,120 @@
 <template>
   <div id="app">
+    <div class="nav-bar">
+      <!-- Login -->
+      <my-button
+        typeBtn="button"
+        styleBtn="nav-item"
+        content="Login"
+        @btnActive="loged(), showNewLogin=true"
+        v-if="!auth"
+      />
+      <my-button
+        typeBtn="button"
+        styleBtn="nav-item"
+        content="LogOut"
+        @btnActive="logout()"
+        v-if="auth"
+      />
+      <modal v-if="showNewLogin" styleModal="ModalPrimary">
+        <my-button typeBtn="button" content="X" @btnActive="showNewLogin=false" styleBtn="close" />
+        <newLogin />
+      </modal>
+
+      <!-- Cadastro de usuário-->
+      <my-button
+        typeBtn="button"
+        content="New user"
+        styleBtn="nav-item"
+        @btnActive="showNewUser=true"
+        v-if="!auth"
+      />
+      <modal v-if="showNewUser" styleModal="ModalPrimary">
+        <my-button typeBtn="button" content="X" @btnActive="showNewUser=false" styleBtn="close" />
+        <new-user />
+      </modal>
+    </div>
+
     <h1>VUTTR</h1>
     <h2>Very Useful Tools to Remember</h2>
+    <h3 id="info" v-if="!auth">To add or remove, please sign in or sign up!</h3>
 
-    <!-- Login -->
-    <btn tipo="button" rotulo="Login" @btnAtivado="logado(), showNewLogin=true" v-if="!auth" />
-    <btn tipo="button" rotulo="LogOut" @btnAtivado="logout()" v-if="auth" />
-    <modal v-if="showNewLogin" estiloModal="padrao">
-      <btn tipo="button" rotulo="Fechar" @btnAtivado="showNewLogin=false" />
-      <newLogin />
-    </modal>
+    <div class="top">
+      <!-- filtred ferramentas -->
+      <div class="inputs-search">
+        <font-awesome-icon icon="search" size="lg" style="margin: auto 0.5%"/>
+        <input
+          type="search"
+          class="search"
+          @input="filter=$event.target.value, filtred()"
+          placeholder="Search..."
+        />
+        <input type="checkbox" class="search-tag" @click="filtred()" />Search only tags
+      </div>
 
-    <!-- Cadastro de usuário-->
-    <btn tipo="button" rotulo="New user" @btnAtivado="showNewUser=true" v-if="!auth" />
-    <modal v-if="showNewUser" estiloModal="padrao">
-      <btn tipo="button" rotulo="Fechar" @btnAtivado="showNewUser=false" />
-      <newUser />
-    </modal>
+      <!-- Cadastro de ferramenta -->
+      <my-button
+        typeBtn="button"
+        content="+ Add"
+        @btnActive="showNewTool=true"
+        styleBtn="neutral"
+        v-if="auth"
+      />
+      <modal v-if="showNewTool" styleModal="ModalPrimary">
+        <my-button typeBtn="button" content="X" @btnActive="showNewTool=false" styleBtn="close" />
+        <new-tool />
+      </modal>
+    </div>
 
-    <!-- Filtrar ferramentas -->
-    <input type="search" @input="filtro=$event.target.value, filtrar()" />
-    <input type="checkbox" class="searchTag" @click="filtrar()" />Search only tags
-    
-    <!-- Cadastro de ferramenta -->
-    <btn tipo="button" rotulo="Add" @btnAtivado="showNewTool=true" />
-    <modal v-if="showNewTool" estiloModal="padrao">
-      <btn tipo="button" rotulo="Fechar" @btnAtivado="showNewTool=false" />
-      <newTool />
-    </modal>
-    
-    <!-- Grid de ferramentas -->
+    <!-- Lista de ferramentas -->
     <div v-for="tool in allTools" :key="tool._id">
-
       <!-- Modal confirmar DELETE -->
-      <modal v-if="removeTool" estiloModal="padrao">
+      <modal v-if="removeTool" styleModal="ModalPrimary">
         <h2>Remove tool</h2>
         <p>Are you sure you want to remove {{ tool.title}}</p>
-        <btn tipo="button" rotulo="Cancel" @btnAtivado="removeTool=false" />
-        <btn tipo="button" rotulo="Accept" @btnAtivado="remove(tool._id)" />
+        <div class="modal-buttons">
+          <my-button
+            typeBtn="button"
+            content="Cancel"
+            @btnActive="removeTool=false"
+            styleBtn="danger"
+          />
+          <my-button
+            typeBtn="button"
+            content="Accept"
+            @btnActive="remove(tool._id)"
+            styleBtn="neutral"
+          />
+        </div>
       </modal>
 
       <!-- Card de ferramenta -->
-      <grid>
-        <btn
-          tipo="button"
-          rotulo="Remover"
-          @btnAtivado="removeTool=true"
-          :confirmacao="true"
-          estilo="padrao"
+      <card>
+        <my-button
+          typeBtn="button"
+          content="Remove"
+          @btnActive="removeTool=true"
+          styleBtn="remove"
+          v-if="auth"
         />
         <h3>
           <a :href="tool.link">{{ tool.title }}</a>
         </h3>
         <p>{{ tool.description }}</p>
-        <span v-for="tag in tool.tags">
-          <p>
+        <span>
+          <p v-for="tag in tool.tags" class="tags">
             <strong>#{{ tag }}</strong>
           </p>
         </span>
-        <h5>{{ tool.author }}</h5>
-      </grid>
-
-
+        <h5>Author: {{ tool.author }}</h5>
+      </card>
     </div>
   </div>
 </template>
 
 <script>
-import Grid from "./components/Grid.vue";
-import Btn from "./components/Btn.vue";
+import Card from "./components/Card.vue";
+import MyButton from "./components/MyButton.vue";
 import Modal from "./components/Modal.vue";
 import NewUser from "./components/NewUser.vue";
 import NewTool from "./components/NewTool.vue";
@@ -77,70 +123,67 @@ import Login from "./components/Login.vue";
 export default {
   name: "app",
   components: {
-    grid: Grid,
-    btn: Btn,
+    card: Card,
+    "my-button": MyButton,
     modal: Modal,
-    newUser: NewUser,
-    newTool: NewTool,
+    "new-user": NewUser,
+    "new-tool": NewTool,
     newLogin: Login
   },
   data() {
     return {
       tools: [],
-      filtro: "",
-      toolsFiltradas: [],
-      showModal: false,
+      filter: "",
+      toolsFiltered: [],
       showNewTool: false,
       showNewUser: false,
       showNewLogin: false,
       auth: { type: Boolean },
-      nameTool: "",
       removeTool: false
     };
   },
 
   methods: {
-    filtrar() {
-      //Filtro por tag
-      let checked = document.querySelector(".searchTag").checked;
-      if (checked && this.filtro.length >= 2) {
+    filtred() {
+      //filtrar por tag
+      let checked = document.querySelector(".search-tag").checked;
+      if (checked && this.filter.length >= 2) {
         this.$http
-          .get(`http://localhost:7000/v1/tools?tag=${this.filtro}`)
+          .get(`http://localhost:7000/v1/tools?tag=${this.filter}`)
           .then(res => res.json())
-          .then(tools => (this.toolsFiltradas = tools));
-      } else if (checked == false && this.filtro) {
-        //Filtro Global
-        let exp = new RegExp(this.filtro.trim(), "i");
-        let filtradas = [];
+          .then(tools => (this.toolsFiltered = tools));
+      } else if (checked == false && this.filter) {
+        //filtrar Global
+        let exp = new RegExp(this.filter.trim(), "i");
+        let filtered = [];
 
-        filtradas = filtradas.concat(
+        filtered = filtered.concat(
           this.tools.filter(tool => exp.test(tool.title)),
           this.tools.filter(tool => exp.test(tool.description)),
           this.tools.filter(tool => exp.test(tool.tags)),
           this.tools.filter(tool => exp.test(tool.author))
         );
 
-        let uniqueValues = [...new Set(filtradas)];
-        this.toolsFiltradas = uniqueValues;
-
+        let uniqueValues = [...new Set(filtered)];
+        this.toolsFiltered = uniqueValues;
       } else {
-        this.toolsFiltradas = this.tools;
+        this.toolsFiltered = this.tools;
       }
     },
 
     remove(id) {
       //Remove por ID
       let token = localStorage.getItem("token");
-      this.$http.delete(`http://localhost:7000/v1/tools/${id}`, {
+      this.$http.delete(`http://localhost:3000/v1/tools/${id}`, {
         headers: {
           authorization: token
         }
       });
       location.reload();
     },
-    
+
     //Verificação de login
-    logado() {
+    loged() {
       if (localStorage.getItem("auth")) {
         this.auth = localStorage.getItem("auth");
         return this.auth;
@@ -158,8 +201,8 @@ export default {
   computed: {
     //Ferramentas
     allTools() {
-      if (this.filtro) {
-        return this.toolsFiltradas;
+      if (this.filter) {
+        return this.toolsFiltered;
       } else {
         return this.tools;
       }
@@ -168,7 +211,7 @@ export default {
 
   created() {
     this.$http
-      .get("http://localhost:7000/v1/tools")
+      .get("http://localhost:3000/v1/tools")
       .then(res => res.json())
       .then(tools => {
         this.auth = localStorage.getItem("auth");
@@ -179,4 +222,59 @@ export default {
 </script>
 
 <style>
+.nav-bar {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4rem;
+  background: #ffffff 0% 0% no-repeat padding-box;
+  opacity: 1;
+  display: flex;
+  justify-content: space-around;
+  z-index: 2;
+  position: fixed;
+}
+
+#info {
+  text-align: center;
+  color: #f95e5a;
+}
+
+.top {
+  width: 80%;
+  margin: 2% auto;
+  display: flex;
+  justify-content: space-around;
+}
+
+span {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.inputs-search {
+  width: 50%;
+  padding: 0%;
+}
+
+.tags {
+  margin-right: 2%;
+}
+
+.search {
+  width: 40%;
+  background: #f5f4f6 0% 0% no-repeat padding-box;
+  border: 1px solid #ebeaed;
+}
+
+.search-tag {
+  width: 20px;
+  margin: 0% 2%;
+  border: none;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+}
 </style>

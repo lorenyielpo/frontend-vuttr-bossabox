@@ -1,6 +1,6 @@
 <template>
   <div class="CardMainElevation4">
-    <slot class="conteudo"></slot>
+    <slot></slot>
   </div>
 </template>
 

@@ -1,24 +1,35 @@
 # Very Useful Tools To Remembers
 
-O VUTTR é uma aplicação frontend para adicionar e pesquisar ferramentadas. Para que o projeto funcione adequademente, clone o repositório em seu computador.
+O VUTTR é uma aplicação frontend para adicionar e pesquisar ferramentadas. Para que o projeto funcione adequademente, clone o repositório em seu computador ou acesse o link: https://vuttr-challenge.netlify.com/.
+
+Para aplicação funcionar é necessário que você clone o repositório da API [VUTTR]().
+
+## Neste projeto foi usado:
+* [Vue.js](https://br.vuejs.org/v2/guide/installation.html)
+* [@fortawesome/vue-fontawesome](https://www.npmjs.com/package/@fortawesome/vue-fontawesome)
+* [Node.js](https://nodejs.org/en/)
 
 
-## Project setup
+# Instalando o projeto:
+
+## Para baixar as dependências 
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Compilar no modo desenvolvimento
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+# Para fazer o deploy:
+
+### Compilar para produção
 ```
 npm run build
 ```
 
-### Run your tests
+### Testar a aplicação
 ```
 npm run test
 ```

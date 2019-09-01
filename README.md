@@ -2,7 +2,7 @@
 
 O VUTTR é uma aplicação frontend para adicionar e pesquisar ferramentadas. Para que o projeto funcione adequademente, clone o repositório em seu computador ou acesse o link: https://vuttr-challenge.netlify.com/.
 
-Para aplicação funcionar é necessário que você clone o repositório da API [VUTTR]().
+Para aplicação funcionar é necessário que você clone o repositório da API [VUTTR](https://github.com/lorenyielpo/bossabox-backend).
 
 ## Neste projeto foi usado:
 * [Vue.js](https://br.vuejs.org/v2/guide/installation.html)

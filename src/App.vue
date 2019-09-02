@@ -18,7 +18,7 @@
       />
       <modal v-if="showNewLogin" styleModal="ModalPrimary">
         <my-button typeBtn="button" content="X" @btnActive="showNewLogin=false" styleBtn="close" />
-        <newLogin />
+        <new-login />
       </modal>
 
       <!-- Cadastro de usuário-->
@@ -42,7 +42,7 @@
     <div class="top">
       <!-- filtred ferramentas -->
       <div class="inputs-search">
-        <font-awesome-icon icon="search" size="lg" style="margin: auto 0.5%"/>
+        <font-awesome-icon icon="search" size="lg" style="margin: auto 0.5%" />
         <input
           type="search"
           class="search"
@@ -66,34 +66,34 @@
       </modal>
     </div>
 
+    <!-- Modal confirmar DELETE -->
+    <modal v-if="removeTool" styleModal="ModalPrimary">
+      <h2>Remove tool</h2>
+      <p>Are you sure you want to remove {{this.toolName}}</p>
+      <div class="modal-buttons">
+        <my-button
+          typeBtn="button"
+          content="Cancel"
+          @btnActive="removeTool=false"
+          styleBtn="danger"
+        />
+        <my-button
+          typeBtn="button"
+          content="Accept"
+          @btnActive="remove()"
+          styleBtn="neutral"
+        />
+      </div>
+    </modal>
+
     <!-- Lista de ferramentas -->
     <div v-for="tool in allTools" :key="tool._id">
-      <!-- Modal confirmar DELETE -->
-      <modal v-if="removeTool" styleModal="ModalPrimary">
-        <h2>Remove tool</h2>
-        <p>Are you sure you want to remove {{ tool.title}}</p>
-        <div class="modal-buttons">
-          <my-button
-            typeBtn="button"
-            content="Cancel"
-            @btnActive="removeTool=false"
-            styleBtn="danger"
-          />
-          <my-button
-            typeBtn="button"
-            content="Accept"
-            @btnActive="remove(tool._id)"
-            styleBtn="neutral"
-          />
-        </div>
-      </modal>
-
       <!-- Card de ferramenta -->
       <card>
         <my-button
           typeBtn="button"
           content="Remove"
-          @btnActive="removeTool=true"
+          @btnActive="catchId(tool._id, tool.title), removeTool=true"
           styleBtn="remove"
           v-if="auth"
         />
@@ -123,18 +123,20 @@ import Login from "./components/Login.vue";
 export default {
   name: "app",
   components: {
-    card: Card,
+    "card": Card,
     "my-button": MyButton,
-    modal: Modal,
+    "modal": Modal,
     "new-user": NewUser,
     "new-tool": NewTool,
-    newLogin: Login
+    "new-login": Login
   },
   data() {
     return {
       tools: [],
       filter: "",
       toolsFiltered: [],
+      toolName: "",
+      idTool: "",
       showNewTool: false,
       showNewUser: false,
       showNewLogin: false,
@@ -149,7 +151,7 @@ export default {
       let checked = document.querySelector(".search-tag").checked;
       if (checked && this.filter.length >= 2) {
         this.$http
-          .get(`http://localhost:7000/v1/tools?tag=${this.filter}`)
+          .get(`http://localhost:3000/v1/tools?tag=${this.filter}`)
           .then(res => res.json())
           .then(tools => (this.toolsFiltered = tools));
       } else if (checked == false && this.filter) {
@@ -171,10 +173,15 @@ export default {
       }
     },
 
-    remove(id) {
+    catchId(tool, name) {
+      this.toolName = name;
+      return this.idTool = tool;
+    },
+
+    remove() {
       //Remove por ID
       let token = localStorage.getItem("token");
-      this.$http.delete(`http://localhost:3000/v1/tools/${id}`, {
+      this.$http.delete(`http://localhost:3000/v1/tools/${this.idTool}`, {
         headers: {
           authorization: token
         }
